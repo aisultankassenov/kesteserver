@@ -75,3 +75,9 @@ app.get('/schedule', function(req, res) {
 	console.log(text);
 	res.json(text);
 });
+
+app.listen(app.get('port'), function() {
+	console.log('Magic is happening on port: ', app.get('port'));
+});
+
+exports = module.exports = app;
