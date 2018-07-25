@@ -16,16 +16,16 @@ app.get('/schedule', function(req, res) {
 		url: loginUrl,
 		method: 'POST',
 		form: {
-			name: 'aisultan.kassenov',
-			pass: 'Minilogo6651',
+			name: req.query.name,
+			pass: req.query.pass,
 			form_id: 'user_login',
 			op: 'Log in'
 		}
 	};
-	var text = [];
 
 	request(options, function(error, response, body) {
 		var cookie = response.headers['set-cookie'];
+		var text = [];
 
 		request.get(
 			{
@@ -43,7 +43,6 @@ app.get('/schedule', function(req, res) {
 					});
 				for (let i = 0; i < k; i++) {
 					var str = text[i];
-					// console.log(typeof (str));
 					text[i] = str.replace(new RegExp('<\\\\/td>', 'g'), '');
 					str = text[i];
 					text[i] = str.replace(new RegExp('\\\\r\\\\n', 'g'), '');
@@ -63,10 +62,6 @@ app.get('/schedule', function(req, res) {
 							string !==
 							'  <-table>                    <-div>                <-div>                <-div>                "'
 					);
-					// for (let j = 0; j < text[i].length; j++) {
-					//     var string = text[i][j];
-					//     text[i][j] = string.split('\\r\\n          ');
-					// }
 				}
 				console.log(text);
 				res.json(text);
