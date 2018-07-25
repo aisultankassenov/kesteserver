@@ -68,12 +68,11 @@ app.get('/schedule', function(req, res) {
 					//     text[i][j] = string.split('\\r\\n          ');
 					// }
 				}
+				console.log(text);
 				res.json(text);
 			}
 		);
 	});
-
-	console.log(text);
 });
 
 app.listen(app.get('port'), function() {
