@@ -175,6 +175,17 @@ app.get('/schedule2', function(req, res) {
 	});
 });
 
+app.get('/logout', function(req, res) {
+	request.get(
+		{
+			url: 'https://registrar.nu.edu.kz/user/logout'
+		},
+		function(req, res) {
+			console.log(res.headers);
+		}
+	);
+});
+
 app.listen(app.get('port'), function() {
 	console.log('Magic is happening on port: ', app.get('port'));
 });
