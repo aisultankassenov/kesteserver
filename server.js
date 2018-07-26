@@ -55,6 +55,7 @@ app.get('/schedule', function(req, res) {
 					str = text[i];
 					text[i] = str.replace(new RegExp('<-span>', 'g'), '');
 					str = text[i];
+					console.log(str);
 					text[i] = str.split('                            ');
 					text[i] = text[i].filter(string => string !== '');
 					text[i] = text[i].filter(string => string !== '    ');
@@ -66,8 +67,26 @@ app.get('/schedule', function(req, res) {
 							string !==
 							'  <-table>                    <-div>                <-div>                <-div>                "'
 					);
+					for (let j = 0; j < text[i].length; j++) {
+						str = text[i][j];
+						if (
+							str.charAt(str.length - 2) === 'A' &&
+							str.charAt(str.length - 1) === 'M'
+						) {
+							text[i][j] = str.replace(new RegExp(' AM', 'g'), '');
+						}
+						if (
+							str.charAt(str.length - 2) === 'P' &&
+							str.charAt(str.length - 1) === 'M'
+						) {
+							str = str.replace(new RegExp(' AM', 'g'), '');
+							var time =
+								parseInt(str[0] + str[1]) + 12 + str[2] + str[3] + str[4];
+							text[i][j] = time;
+						}
+					}
 				}
-				console.log(text);
+				// console.log(text);
 				res.json(text);
 			}
 		);
@@ -118,17 +137,40 @@ app.get('/schedule2', function(req, res) {
 					str = text[i];
 					text[i] = str.replace(new RegExp('<-tr>', 'g'), '');
 					str = text[i];
-					text[i] = str.replace(new RegExp('    <-span>', 'g'), '');
+					text[i] = str.replace(new RegExp('<-span>', 'g'), '');
 					str = text[i];
+					console.log(str);
 					text[i] = str.split('                            ');
 					text[i] = text[i].filter(string => string !== '');
+					text[i] = text[i].filter(string => string !== '    ');
+					text[i] = text[i].filter(string => string !== '   ');
+					text[i] = text[i].filter(string => string !== ' ');
+					text[i] = text[i].filter(string => string !== '  ');
 					text[i] = text[i].filter(
 						string =>
 							string !==
 							'  <-table>                    <-div>                <-div>                <-div>                "'
 					);
+					for (let j = 0; j < text[i].length; j++) {
+						str = text[i][j];
+						if (
+							str.charAt(str.length - 2) === 'A' &&
+							str.charAt(str.length - 1) === 'M'
+						) {
+							text[i][j] = str.replace(new RegExp(' AM', 'g'), '');
+						}
+						if (
+							str.charAt(str.length - 2) === 'P' &&
+							str.charAt(str.length - 1) === 'M'
+						) {
+							str = str.replace(new RegExp(' AM', 'g'), '');
+							var time =
+								parseInt(str[0] + str[1]) + 12 + str[2] + str[3] + str[4];
+							text[i][j] = time;
+						}
+					}
 				}
-				console.log(text);
+				// console.log(text);
 				res.json(text);
 			}
 		);
