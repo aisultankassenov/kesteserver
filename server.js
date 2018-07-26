@@ -11,7 +11,6 @@ app.use(express.static(__dirname + '/public'));
 app.get('/schedule', function(req, res) {
 	var urlWithLoginForm = 'https://registrar.nu.edu.kz/';
 	var loginUrl = urlWithLoginForm + '/index.php?q=user/login';
-	var formData = { name: 'aisultan.kassenov', pass: 'Minilogo6651' };
 	var options = {
 		url: loginUrl,
 		method: 'POST',
@@ -95,7 +94,6 @@ app.get('/schedule', function(req, res) {
 app.get('/schedule2', function(req, res) {
 	var urlWithLoginForm = 'https://registrar.nu.edu.kz/';
 	var loginUrl = urlWithLoginForm + '/index.php?q=user/login';
-	var formData = { name: 'aisultan.kassenov', pass: 'Minilogo6651' };
 	var options = {
 		url: loginUrl,
 		method: 'POST',
