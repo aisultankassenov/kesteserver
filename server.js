@@ -57,6 +57,7 @@ app.get('/schedule', function(req, res) {
 					str = text[i];
 					text[i] = str.split('                            ');
 					text[i] = text[i].filter(string => string !== '');
+					text[i] = text[i].filter(string => string !== '    ');
 					text[i] = text[i].filter(
 						string =>
 							string !==
