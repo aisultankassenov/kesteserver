@@ -53,7 +53,7 @@ app.get('/schedule', function(req, res) {
 					str = text[i];
 					text[i] = str.replace(new RegExp('<-tr>', 'g'), '');
 					str = text[i];
-					text[i] = str.replace(new RegExp('    <-span>', 'g'), '');
+					text[i] = str.replace(new RegExp('<-span>', 'g'), '');
 					str = text[i];
 					text[i] = str.split('                            ');
 					text[i] = text[i].filter(string => string !== '');
