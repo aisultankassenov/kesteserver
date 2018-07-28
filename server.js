@@ -251,10 +251,22 @@ app.get('/image', function(req, res) {
 	});
 });
 
-app.get('/logout', function(req, res) {
+app.get('/logoutRegistrar', function(req, res) {
 	request.get(
 		{
 			url: 'https://registrar.nu.edu.kz/user/logout'
+		},
+		function(req, response) {
+			res.json();
+			console.log(res);
+		}
+	);
+});
+app.get('/logoutImage', function(req, res) {
+	request.get(
+		{
+			url:
+				'http://my.nu.edu.kz/wps/myportal/student/home/homeinfo/!ut/p/b1/04_SjzQ0MjM0NTEytTTTj9CPykssy0xPLMnMz0vM0Q_0yU9PT03xLy0BSUWZxRv5B7o6Ohk6Grj7GJoZOHp7BZq6mVsaOfuaAhVEAhUY4ACOBoT0h-tH4VNi4GICVYDHCj-Ee3Mjo9KCA9IVAceucUc!/dl4/d5/L3dDb1ZJQSEhL3dPb0JKTnNBLzRIeWlELVVJV0dFIS9lWW1uVjVxUXhVQS8xNTYxL2xv/'
 		},
 		function(req, response) {
 			res.json();
