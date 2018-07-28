@@ -3,8 +3,9 @@ var app = express();
 var request = require('request');
 request = request.defaults({ jar: true });
 var cheerio = require('cheerio');
+// var opn = require('opn');
 
-app.set('port', process.env.PORT || 3000);
+app.set('port', process.env.PORT || 5000);
 
 app.use(express.static(__dirname + '/public'));
 
@@ -54,7 +55,7 @@ app.get('/schedule', function(req, res) {
 					str = text[i];
 					text[i] = str.replace(new RegExp('<-span>', 'g'), '');
 					str = text[i];
-					console.log(str);
+					// console.log(str);
 					text[i] = str.split('                            ');
 					text[i] = text[i].filter(string => string !== '');
 					text[i] = text[i].filter(string => string !== '    ');
@@ -91,6 +92,7 @@ app.get('/schedule', function(req, res) {
 		);
 	});
 });
+
 app.get('/schedule2', function(req, res) {
 	var urlWithLoginForm = 'https://registrar.nu.edu.kz/';
 	var loginUrl = urlWithLoginForm + '/index.php?q=user/login';
@@ -137,7 +139,7 @@ app.get('/schedule2', function(req, res) {
 					str = text[i];
 					text[i] = str.replace(new RegExp('<-span>', 'g'), '');
 					str = text[i];
-					console.log(str);
+					// console.log(str);
 					text[i] = str.split('                            ');
 					text[i] = text[i].filter(string => string !== '');
 					text[i] = text[i].filter(string => string !== '    ');
@@ -169,7 +171,7 @@ app.get('/schedule2', function(req, res) {
 					}
 				}
 				// console.log(text);
-				response.json(text);
+				res.json(text);
 			}
 		);
 	});
@@ -196,11 +198,54 @@ app.get('/exam-schedule', function(req, res) {
 		request.get(
 			{
 				url:
-					'https://registrar.nu.edu.kz/my-registrar/final-exam-schedule/json?method=getExams&_dc=1532599311786&page=1&start=0&limit=25',
-				cookie: cookie
+					'https://registrar.nu.edu.kz/my-registrar/final-exam-schedule/json?method=getExams&_dc=1532629016423&page=1&start=0&limit=25',
+				Cookie: cookie
 			},
-			function(err, req, res) {
-				console.log('success');
+			function(err, response, body) {
+				var str = body;
+				str = str.replace(new RegExp('"', 'g'), '');
+				console.log(typeof str);
+				str = str.replace(new RegExp('{', 'g'), '');
+				str = str.replace(new RegExp('}', 'g'), '');
+				str = str.replace(new RegExp(', ', 'g'), ' ');
+				str = str.replace(/\[+(.*?)\]+/g, '$1');
+				text = str.split(',');
+				for (let j = 0; j < text.length; j++) {
+					str = text[j];
+					text[j] = str.split(':');
+					if (text[j][2]) {
+						text[j][1] = text[j][1] + ':' + text[j][2];
+						text[j].splice(2, 1);
+					}
+				}
+				console.log(text);
+				res.json(text);
+			}
+		);
+	});
+});
+
+app.get('/image', function(req, res) {
+	var options = {
+		url:
+			'http://my.nu.edu.kz/wps/portal/student/!ut/p/b1/04_Sj9CPykssy0xPLMnMz0vM0Q_0yU9PT03xLy0BSUWZxRv5B7o6Ohk6Grj7GJoZOHp7BZq6mVsaGYQYAhVEAhUY4ACOBoT0h-tH4VXiYwZVgMcKP4R7CzJyLD11HRUBTJ2PsA!!/dl4/d5/L2dBISEvZ0FBIS9nQSEh/pw/Z7_2OQEAB1A0GUP70Q8T8QUCT00G5/act/id=0/393877287541/-/?login=' +
+			req.query.name +
+			'&password=' +
+			req.query.pass +
+			'&loginSubmit=Login'
+	};
+
+	request.get(options, function(error, response, body) {
+		request.get(
+			'http://my.nu.edu.kz/wps/myportal/student/home/my_account/!ut/p/b1/04_SjzQ0NjcxNDYyNbDUj9CPykssy0xPLMnMz0vMAfGjzOKN_ANdHZ0MHQ3cfQzNDBy9vQJN3cwtjZx9TYEKIoEKDHAARwNC-sP1o_ApMXAxgSrAY4WfR35uqn5uVI6lp66jIgBkvDO-/dl4/d5/L2dQX19fX0EhL29Ed3dBQUFRaENFSVFoQ0VJUWhDRUlRaENFSVFoQUEhLzRKa0dZaG1ZWmhHWlJtTVpuR1lKbVNaaW1acG1HWmxtWTVtZVpnV1pGbUpabVdZVm1WWmpXWjFtRFprMll0bWJaaDAhL1o2XzJPUUVBQjFBMEdMMTYwQUtKUTVGNzkyQ001L1o2XzJPUUVBQjFBMEdMMTYwQUtKUTVGNzkyQ0UxL1o2XzJPUUVBQjFBMDAzTDMwQUNOVkJWNUkyMEcxL1o2XzJPUUVBQjFBME81TkEwQTczRVQ2MzUxME81L1o2XzJPUUVBQjFBMEc1VkYwQVM1MUlJTEkzMDQ0L1o2XzJPUUVBQjFBMDAxMkUwQUtWMzhERU8xMFUyL1o2XzJPUUVBQjFBME9OQUQwQUNTVTBDMFExMEQ2L1o2XzJPUUVBQjFBMDgxTzcwQVNERUdLOTcyMEcxL1o2XzJPUUVBQjFBMEcwN0IwQTVQQjFPSDQwMEcxL1o2XzJPUUVBQjFBMEc1UDYwQUY4QTFLTkQyMEc1L1o2XzJPUUVBQjFBME9OQUQwQUNTVTBDMFExMDUzL1o2XzJPUUVBQjFBMDhNRTgwQVNKRzVDTkIwMDgwL1o2XzJPUUVBQjFBMDhWRzgwUU8wVExPMEQyMEcxL1o2XzJPUUVBQjFBMDBDRzcwQVVLUzNGU0cyMDQwL1o2XzJPUUVBQjFBMEdWTzcwUU8wVEgwSUYxMEcxL1o2XzJPUUVBQjFBMDBDRzcwQVVLUzNGU0cyME82L1o2XzJPUUVBQjFBMDBDRzcwQVVLUzNGU0cyMDQ1L1o2XzJPUUVBQjFBMDAwSDgwQVJFUUJPSFMxMDg3L1o2XzJPUUVBQjFBMEdCSTUwQUlDVFNMU1UxMEcxL1o2XzJPUUVBQjFBMDhUVjAwQVNQRkdMQ0owMEs1L1o2XzJPUUVBQjFBMDhDSTcwQUkyMDFNTTQwME8zL1o2XzJPUUVBQjFBMEc0OTUwQTFTUUhMNEkxMEcxL1o2XzJPUUVBQjFBMEc1UDYwQUY4QTFLTkQyMEc3L1o2XzJPUUVBQjFBMDhNRTgwQVNKRzVDTkIwMDg1L1o2XzJPUUVBQjFBME8wUDcwQTdRM0czUzIxMDQ1L1o2XzJPUUVBQjFBMEdHSTUwQUw3NlVJRTcxMEcxL1o2XzJPUUVBQjFBMDBCRkIwQVRNS1AwNEIyMEcxL1o2XzJPUUVBQjFBMEdTMzQwQTUxUFBSVjEyMEs0/',
+			function(err, response, body) {
+				// console.log(body);
+				var $ = cheerio.load(body);
+				var src = $('.my_profile')
+					.children('.profile_photo')
+					.children()
+					.attr('src');
+				res.json(src);
 			}
 		);
 	});
@@ -211,7 +256,8 @@ app.get('/logout', function(req, res) {
 		{
 			url: 'https://registrar.nu.edu.kz/user/logout'
 		},
-		function(req, res) {
+		function(req, response) {
+			res.json();
 			console.log(res);
 		}
 	);
