@@ -56,7 +56,7 @@ app.get('/info', function(req, res) {
 				}
 				text = text.filter(array => array.length === 3);
 				text = text.map(array => array.splice(0, 2));
-				console.log(text);
+				res.json(text);
 			}
 		);
 	});
