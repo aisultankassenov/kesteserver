@@ -55,7 +55,7 @@ app.get('/info', function(req, res) {
 					}
 				}
 				text = text.filter(array => array.length === 3);
-				text = text.map(array => array.splice(0, 2));
+				text = text.map(array => array.splice(1, 1));
 				res.json(text);
 			}
 		);
