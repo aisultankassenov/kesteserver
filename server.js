@@ -139,7 +139,6 @@ app.get('/schedule', function(req, res) {
 						}
 					}
 				}
-				// console.log(text);
 				res.json(text);
 			}
 		);
