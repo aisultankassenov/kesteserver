@@ -9,7 +9,7 @@ app.set('port', process.env.PORT || 5000);
 
 app.use(express.static(__dirname + '/public'));
 
-app.get('/schedule', function(req, res) {
+app.get('/info', function(req, res) {
 	var urlWithLoginForm = 'https://registrar.nu.edu.kz/';
 	var loginUrl = urlWithLoginForm + '/index.php?q=user/login';
 	var options = {
@@ -30,70 +30,39 @@ app.get('/schedule', function(req, res) {
 		request.get(
 			{
 				url:
-					'https://registrar.nu.edu.kz/my-registrar/personal-schedule/json?_dc=1532493031960&method=drawStudentSchedule',
+					'https://registrar.nu.edu.kz/my-registrar/personal-schedule/json?_dc=1533010471054&method=getStudentInfo',
 				Cookie: cookie
 			},
-			function(err, response, body) {
-				var k = 0;
-				var $ = cheerio.load(body);
-				$('tbody')
-					.children()
-					.each(function(i, elem) {
-						text[k++] = $(this).text();
-					});
-				for (let i = 0; i < k; i++) {
-					var str = text[i];
-					text[i] = str.replace(new RegExp('<\\\\/td>', 'g'), '');
-					str = text[i];
-					text[i] = str.replace(new RegExp('\\\\r\\\\n', 'g'), '');
-					str = text[i];
-					text[i] = str.replace(new RegExp('<\\\\/i>', 'g'), '');
-					str = text[i];
-					text[i] = str.replace(new RegExp('\\\\/', 'g'), '-');
-					str = text[i];
-					text[i] = str.replace(new RegExp('<-tr>', 'g'), '');
-					str = text[i];
-					text[i] = str.replace(new RegExp('<-span>', 'g'), '');
-					str = text[i];
-					// console.log(str);
-					text[i] = str.split('                            ');
-					text[i] = text[i].filter(string => string !== '');
-					text[i] = text[i].filter(string => string !== '    ');
-					text[i] = text[i].filter(string => string !== '   ');
-					text[i] = text[i].filter(string => string !== ' ');
-					text[i] = text[i].filter(string => string !== '  ');
-					text[i] = text[i].filter(
-						string =>
-							string !==
-							'  <-table>                    <-div>                <-div>                <-div>                "'
-					);
-					for (let j = 0; j < text[i].length; j++) {
-						str = text[i][j];
-						if (
-							str.charAt(str.length - 2) === 'A' &&
-							str.charAt(str.length - 1) === 'M'
-						) {
-							text[i][j] = str.replace(new RegExp(' AM', 'g'), '');
-						}
-						if (
-							str.charAt(str.length - 2) === 'P' &&
-							str.charAt(str.length - 1) === 'M'
-						) {
-							str = str.replace(new RegExp(' AM', 'g'), '');
-							var time =
-								parseInt(str[0] + str[1]) + 12 + str[2] + str[3] + str[4];
-							text[i][j] = time;
-						}
+			function(err, resp, body) {
+				var str = body;
+				str = str.replace(new RegExp('"', 'g'), '');
+				str = str.replace(new RegExp('{', 'g'), '');
+				str = str.replace(new RegExp('}', 'g'), '');
+				str = str.replace(/\[+(.*?)\]+/g, '$1');
+				str = str.split(',');
+				text = str;
+				for (let i = 0; i < str.length; i++) {
+					text[i] = text[i].split(':');
+					if (
+						text[i][0] === 'FIRSTNAME' ||
+						text[i][0] === 'STUDENTID' ||
+						text[i][0] === 'LASTNAME' ||
+						text[i][0] === 'NUEMAIL' ||
+						text[i][0] === 'YOS' ||
+						text[i][0] === 'MAJORNAME'
+					) {
+						text[i].push('');
 					}
 				}
-				// console.log(text);
-				res.json(text);
+				text = text.filter(array => array.length === 3);
+				text = text.map(array => array.splice(0, 2));
+				console.log(text);
 			}
 		);
 	});
 });
 
-app.get('/schedule2', function(req, res) {
+app.get('/schedule', function(req, res) {
 	var urlWithLoginForm = 'https://registrar.nu.edu.kz/';
 	var loginUrl = urlWithLoginForm + '/index.php?q=user/login';
 	var options = {
