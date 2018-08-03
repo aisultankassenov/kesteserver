@@ -219,7 +219,7 @@ const scheduleToItems = schedules => {
 					to: schedule[1]
 				},
 				date: {
-					form: schedule[7],
+					from: schedule[7],
 					to: schedule[8]
 				},
 				room: schedule[2],
