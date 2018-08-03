@@ -204,11 +204,41 @@ app.get('/schedule', function(req, res) {
 					}
 				}
 
-				res.json(obj);
+				res.json(scheduleToItems(obj));
 			}
 		);
 	});
 });
+
+const scheduleToItems = schedules => {
+	const parse = name => {
+		return schedules[name].map(schedule => {
+			const item = {
+				time: {
+					from: schedule[0],
+					to: schedule[1]
+				},
+				date: {
+					form: schedule[7],
+					to: schedule[8]
+				},
+				room: schedule[2],
+				title: schedule[3],
+				type: schedule[5],
+				profName: schedule[6]
+			};
+
+			return item;
+		});
+	};
+
+	const data = Object.keys(schedules).reduce((acc, item) => {
+		acc[item] = parse(item);
+		return acc;
+	}, {});
+
+	return data;
+};
 
 app.get('/exam-schedule', function(req, res) {
 	var urlWithLoginForm = 'https://registrar.nu.edu.kz/';
