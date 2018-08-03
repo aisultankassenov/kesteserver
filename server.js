@@ -5,7 +5,7 @@ request = request.defaults({ jar: true });
 var cheerio = require('cheerio');
 // var opn = require('opn');
 
-app.set('port', process.env.PORT || 5000);
+app.set('port', process.env.PORT || 3000);
 
 app.use(express.static(__dirname + '/public'));
 
@@ -61,6 +61,45 @@ app.get('/info', function(req, res) {
 		);
 	});
 });
+
+// app.get('/schedule2', function(req, res) {
+// 	var urlWithLoginForm = 'https://registrar.nu.edu.kz/';
+// 	var loginUrl = urlWithLoginForm + '/index.php?q=user/login';
+// 	var options = {
+// 		url: loginUrl,
+// 		method: 'POST',
+// 		form: {
+// 			name: 'aisultan.kassenov',
+// 			pass: 'Minilogo6651',
+// 			form_id: 'user_login',
+// 			op: 'Log in'
+// 		}
+// 	};
+
+// 	request(options, function(error, response, body) {
+// 		var cookie = response.headers['set-cookie'];
+// 		var text = [];
+
+// 		request.get(
+// 			{
+// 				url:
+// 					'https://registrar.nu.edu.kz/my-registrar/personal-schedule/json?_dc=1532521851073&method=drawStudentSchedule&type=reg',
+// 				Cookie: cookie
+// 			},
+// 			(err, response, body) => {
+// 				var $ = cheerio.load(body);
+// 				$('tbody')
+// 					.children()
+// 					.each(function(i, elem) {
+// 						if (i === 2) {
+// 							console.log(elem.children[1].children);
+// 							// res.send(elem);
+// 						}
+// 					});
+// 			}
+// 		);
+// 	});
+// });
 
 app.get('/schedule', function(req, res) {
 	var urlWithLoginForm = 'https://registrar.nu.edu.kz/';
@@ -132,14 +171,40 @@ app.get('/schedule', function(req, res) {
 							str.charAt(str.length - 2) === 'P' &&
 							str.charAt(str.length - 1) === 'M'
 						) {
-							str = str.replace(new RegExp(' AM', 'g'), '');
-							var time =
-								parseInt(str[0] + str[1]) + 12 + str[2] + str[3] + str[4];
-							text[i][j] = time;
+							text[i][j] = str.replace(new RegExp(' PM', 'g'), '');
+							if (
+								str.charAt(str.length - 2) !== 1 &&
+								str.charAt(str.length - 1) !== 2
+							) {
+								if (str.charAt(0) + str.charAt(1) !== '12') {
+									var time =
+										parseInt(str[0] + str[1]) + 12 + str[2] + str[3] + str[4];
+									text[i][j] = time;
+								}
+							}
 						}
 					}
 				}
-				res.json(text);
+				let obj = {};
+
+				for (let index = 0; index < text.length; index++) {
+					const element = text[index];
+					if (element.length === 1) {
+						index++;
+						let array = [];
+						while (true) {
+							array.push(text[index]);
+							index++;
+							if (index === text.length || text[index].length === 1) {
+								index--;
+								break;
+							}
+						}
+						obj = { ...obj, [element]: array };
+					}
+				}
+
+				res.json(obj);
 			}
 		);
 	});
@@ -172,7 +237,7 @@ app.get('/exam-schedule', function(req, res) {
 			function(err, response, body) {
 				var str = body;
 				str = str.replace(new RegExp('"', 'g'), '');
-				console.log(typeof str);
+				// console.log(typeof str);
 				str = str.replace(new RegExp('{', 'g'), '');
 				str = str.replace(new RegExp('}', 'g'), '');
 				str = str.replace(new RegExp(', ', 'g'), ' ');
@@ -186,7 +251,7 @@ app.get('/exam-schedule', function(req, res) {
 						text[j].splice(2, 1);
 					}
 				}
-				console.log(text);
+				// console.log(text);
 				res.json(text);
 			}
 		);
@@ -226,7 +291,7 @@ app.get('/logoutRegistrar', function(req, res) {
 		},
 		function(req, response) {
 			res.json();
-			console.log(res);
+			// console.log(res);
 		}
 	);
 });
@@ -238,7 +303,7 @@ app.get('/logoutImage', function(req, res) {
 		},
 		function(req, response) {
 			res.json();
-			console.log(res);
+			// console.log(res);
 		}
 	);
 });
