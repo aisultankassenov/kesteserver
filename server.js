@@ -59,17 +59,47 @@ app.get('/info', function (req, res) {
 				res.json(text);
 			}
 		);
-		request.get(
-			{
-				url: 'https://registrar.nu.edu.kz/user/logout'
-			},
-			function (req, response) {
-				res.json();
-				// console.log(res);
-			}
-		);
 	});
 });
+
+// app.get('/schedule2', function(req, res) {
+// 	var urlWithLoginForm = 'https://registrar.nu.edu.kz/';
+// 	var loginUrl = urlWithLoginForm + '/index.php?q=user/login';
+// 	var options = {
+// 		url: loginUrl,
+// 		method: 'POST',
+// 		form: {
+// 			name: 'aisultan.kassenov',
+// 			pass: 'Minilogo6651',
+// 			form_id: 'user_login',
+// 			op: 'Log in'
+// 		}
+// 	};
+
+// 	request(options, function(error, response, body) {
+// 		var cookie = response.headers['set-cookie'];
+// 		var text = [];
+
+// 		request.get(
+// 			{
+// 				url:
+// 					'https://registrar.nu.edu.kz/my-registrar/personal-schedule/json?_dc=1532521851073&method=drawStudentSchedule&type=reg',
+// 				Cookie: cookie
+// 			},
+// 			(err, response, body) => {
+// 				var $ = cheerio.load(body);
+// 				$('tbody')
+// 					.children()
+// 					.each(function(i, elem) {
+// 						if (i === 2) {
+// 							console.log(elem.children[1].children);
+// 							// res.send(elem);
+// 						}
+// 					});
+// 			}
+// 		);
+// 	});
+// });
 
 app.get('/schedule', function (req, res) {
 	var urlWithLoginForm = 'https://registrar.nu.edu.kz/';
@@ -177,15 +207,6 @@ app.get('/schedule', function (req, res) {
 				res.json(scheduleToItems(obj));
 			}
 		);
-		request.get(
-			{
-				url: 'https://registrar.nu.edu.kz/user/logout'
-			},
-			function (req, response) {
-				res.json();
-				// console.log(res);
-			}
-		);
 	});
 });
 
@@ -219,6 +240,54 @@ const scheduleToItems = schedules => {
 	return data;
 };
 
+app.get('/exam-schedule', function (req, res) {
+	var urlWithLoginForm = 'https://registrar.nu.edu.kz/';
+	var loginUrl = urlWithLoginForm + '/index.php?q=user/login';
+	var options = {
+		url: loginUrl,
+		method: 'POST',
+		form: {
+			name: req.query.name,
+			pass: req.query.pass,
+			form_id: 'user_login',
+			op: 'Log in'
+		}
+	};
+
+	request(options, function (error, response, body) {
+		var cookie = response.headers['set-cookie'];
+		var text = [];
+
+		request.get(
+			{
+				url:
+					'https://registrar.nu.edu.kz/my-registrar/final-exam-schedule/json?method=getExams&_dc=1532629016423&page=1&start=0&limit=25',
+				Cookie: cookie
+			},
+			function (err, response, body) {
+				var str = body;
+				str = str.replace(new RegExp('"', 'g'), '');
+				// console.log(typeof str);
+				str = str.replace(new RegExp('{', 'g'), '');
+				str = str.replace(new RegExp('}', 'g'), '');
+				str = str.replace(new RegExp(', ', 'g'), ' ');
+				str = str.replace(/\[+(.*?)\]+/g, '$1');
+				text = str.split(',');
+				for (let j = 0; j < text.length; j++) {
+					str = text[j];
+					text[j] = str.split(':');
+					if (text[j][2]) {
+						text[j][1] = text[j][1] + ':' + text[j][2];
+						text[j].splice(2, 1);
+					}
+				}
+				// console.log(text);
+				res.json(text);
+			}
+		);
+	});
+});
+
 app.get('/image', function (req, res) {
 	var options = {
 		url:
@@ -243,16 +312,6 @@ app.get('/image', function (req, res) {
 			}
 		);
 	});
-
-	request.get(
-		{
-			url:
-				'http://my.nu.edu.kz/wps/myportal/student/home/homeinfo/!ut/p/b1/04_SjzQ0MjM0NTEytTTTj9CPykssy0xPLMnMz0vM0Q_0yU9PT03xLy0BSUWZxRv5B7o6Ohk6Grj7GJoZOHp7BZq6mVsaOfuaAhVEAhUY4ACOBoT0h-tH4VNi4GICVYDHCj-Ee3Mjo9KCA9IVAceucUc!/dl4/d5/L3dDb1ZJQSEhL3dPb0JKTnNBLzRIeWlELVVJV0dFIS9lWW1uVjVxUXhVQS8xNTYxL2xv/'
-		},
-		function (req, response) {
-			res.json();
-		}
-	);
 });
 
 app.get('/logoutRegistrar', function (req, res) {
