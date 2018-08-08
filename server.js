@@ -4,6 +4,7 @@ var request = require('request');
 var cheerio = require('cheerio');
 const bodyParser = require('body-parser');
 
+app.set('port', process.env.PORT || 3000);
 app.use(express.static(__dirname + '/public'));
 
 app.use((req, res, next) => {
@@ -264,8 +265,7 @@ app.get('/image', function(req, res) {
 	});
 });
 
-app.listen(3000, function() {
-	console.log('Magic is happening on port: ', 3000);
+app.listen(app.get('port'), function() {
+	console.log('Magic is happening on port: ', app.get('port'));
 });
-
 exports = module.exports = app;
